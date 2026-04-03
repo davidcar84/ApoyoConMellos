@@ -56,6 +56,12 @@ const DataService = (() => {
   }
 
   async function getAgenda(isoWeek) {
+    // Check localStorage first (has latest edits)
+    const local = localStorage.getItem(`agenda_${isoWeek}`);
+    if (local) {
+      try { return JSON.parse(local); } catch { /* fall through */ }
+    }
+    // Fallback to static file on server
     try {
       return await fetchJSON(`/data/agenda/${isoWeek}.json`);
     } catch {
@@ -69,9 +75,10 @@ const DataService = (() => {
     const path = `data/agenda/${isoWeek}.json`;
     const token = localStorage.getItem('github_token');
 
+    // Always save to localStorage for immediate reads
+    localStorage.setItem(`agenda_${isoWeek}`, JSON.stringify(agendaData));
+
     if (!token) {
-      // Fallback: save to localStorage for offline/demo mode
-      localStorage.setItem(`agenda_${isoWeek}`, JSON.stringify(agendaData));
       return true;
     }
 
