@@ -1,15 +1,15 @@
-const CACHE_NAME = 'apoyo-mellos-v3';
+const CACHE_NAME = 'apoyo-mellos-v4';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/helper.html',
-  '/css/styles.css',
-  '/js/utils.js',
-  '/js/data-service.js',
-  '/js/notifications.js',
-  '/js/app.js',
-  '/js/helper-app.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './helper.html',
+  './css/styles.css',
+  './js/utils.js',
+  './js/data-service.js',
+  './js/notifications.js',
+  './js/app.js',
+  './js/helper-app.js',
+  './manifest.json'
 ];
 
 // Install: cache static assets
