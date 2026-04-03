@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apoyo-mellos-v2';
+const CACHE_NAME = 'apoyo-mellos-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -20,7 +20,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: clean old caches and take control immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -30,26 +30,18 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first for data, cache-first for assets
+// Fetch: network-first for everything, cache as fallback (offline)
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
-  // Data files: always try network first
-  if (url.pathname.startsWith('/data/')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // Cache successful responses for offline use
+        if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Static assets: cache first
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
