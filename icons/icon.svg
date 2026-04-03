@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#6c5ce7"/>
+  <text x="256" y="200" text-anchor="middle" font-size="120" font-family="Arial" fill="white" font-weight="bold">A</text>
+  <text x="256" y="340" text-anchor="middle" font-size="60" font-family="Arial" fill="rgba(255,255,255,0.9)">Mellos</text>
+</svg>

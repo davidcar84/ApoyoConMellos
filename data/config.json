@@ -1,0 +1,8 @@
+{
+  "ventana_semanas": 2,
+  "bloques_horarios": ["7-9 AM", "9-12 PM", "12-2 PM", "2-5 PM", "5-8 PM"],
+  "categorias": ["Niños", "Perrita", "Hogar"],
+  "github_owner": "davidcar84",
+  "github_repo": "ApoyoConMellos",
+  "github_branch": "main"
+}

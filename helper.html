@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6c5ce7">
+  <title>Apoyo con Mellos - Helper</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+  <header class="header">
+    <h1>Apoyo con Mellos</h1>
+    <p class="header-subtitle" id="helper-greeting">Cargando...</p>
+  </header>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="active" id="tab-disponible">Disponible</button>
+    <button id="tab-mis-turnos">Mis turnos</button>
+  </div>
+
+  <!-- Summary/Filter Bar -->
+  <div class="summary-bar" id="summary-bar"></div>
+
+  <!-- Helper Welcome -->
+  <div class="helper-welcome" id="helper-welcome" style="display:none">
+    <h2 id="welcome-name"></h2>
+    <p>Estas son las actividades en las que puedes ayudar:</p>
+    <div class="helper-skills" id="welcome-skills"></div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <div class="loading"><div class="spinner"></div></div>
+  </main>
+
+  <!-- Modal: Detalle bloque -->
+  <div class="modal-overlay" id="modal-detalle">
+    <div class="modal">
+      <button class="modal-close" id="modal-detalle-close">&times;</button>
+      <h2 id="detalle-title">Detalle del bloque</h2>
+      <div id="detalle-content"></div>
+    </div>
+  </div>
+
+  <!-- Error: no helper -->
+  <div id="error-no-helper" style="display:none">
+    <div class="empty-state">
+      <div class="icon">&#128274;</div>
+      <p>Link no válido</p>
+      <p style="font-size:0.85rem;margin-top:8px">Pide a los papás que te compartan tu link personal</p>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/data-service.js"></script>
+  <script src="js/helper-app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+</body>
+</html>

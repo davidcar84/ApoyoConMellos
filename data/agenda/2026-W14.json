@@ -1,0 +1,216 @@
+{
+  "semana": "2026-W14",
+  "fecha_inicio": "2026-03-30",
+  "notas_semana": "Señora de aseo viene Lun y Mié 8-12",
+  "bloques": [
+    {
+      "id": "blk-001",
+      "fecha": "2026-03-30",
+      "horario": "7-9 AM",
+      "actividades": ["act-01", "act-02"],
+      "helpers_asignados": ["h-01"],
+      "personas_necesarias": 2,
+      "estado": "confirmado",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-002",
+      "fecha": "2026-03-30",
+      "horario": "2-5 PM",
+      "actividades": ["act-05", "act-06"],
+      "helpers_asignados": ["h-02"],
+      "personas_necesarias": 1,
+      "estado": "confirmado",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-003",
+      "fecha": "2026-03-30",
+      "horario": "5-8 PM",
+      "actividades": ["act-03", "act-04", "act-01"],
+      "helpers_asignados": [],
+      "personas_necesarias": 2,
+      "estado": "sin_cubrir",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-004",
+      "fecha": "2026-03-31",
+      "horario": "7-9 AM",
+      "actividades": ["act-01", "act-02"],
+      "helpers_asignados": ["h-01"],
+      "personas_necesarias": 2,
+      "estado": "confirmado",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-005",
+      "fecha": "2026-03-31",
+      "horario": "2-5 PM",
+      "actividades": ["act-07", "act-08"],
+      "helpers_asignados": ["h-03"],
+      "personas_necesarias": 1,
+      "estado": "pendiente",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-006",
+      "fecha": "2026-04-01",
+      "horario": "9-12 PM",
+      "actividades": ["act-03", "act-01"],
+      "helpers_asignados": [],
+      "personas_necesarias": 1,
+      "estado": "sin_cubrir",
+      "importante": false,
+      "notas": "Señora de aseo viene hoy"
+    },
+    {
+      "id": "blk-007",
+      "fecha": "2026-04-01",
+      "horario": "2-5 PM",
+      "actividades": ["act-05", "act-06", "act-09"],
+      "helpers_asignados": ["h-02"],
+      "personas_necesarias": 1,
+      "estado": "pendiente",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-008",
+      "fecha": "2026-04-01",
+      "horario": "5-8 PM",
+      "actividades": ["act-03", "act-04"],
+      "helpers_asignados": ["h-04"],
+      "personas_necesarias": 2,
+      "estado": "confirmado",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-009",
+      "fecha": "2026-04-02",
+      "horario": "7-9 AM",
+      "actividades": ["act-01", "act-02"],
+      "helpers_asignados": ["h-01"],
+      "personas_necesarias": 2,
+      "estado": "confirmado",
+      "importante": true,
+      "notas": "Cita médica de 10 a 12"
+    },
+    {
+      "id": "blk-010",
+      "fecha": "2026-04-02",
+      "horario": "2-5 PM",
+      "actividades": ["act-05", "act-06"],
+      "helpers_asignados": ["h-02"],
+      "personas_necesarias": 1,
+      "estado": "pendiente",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-011",
+      "fecha": "2026-04-02",
+      "horario": "5-8 PM",
+      "actividades": ["act-03", "act-04", "act-01"],
+      "helpers_asignados": [],
+      "personas_necesarias": 2,
+      "estado": "sin_cubrir",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-012",
+      "fecha": "2026-04-03",
+      "horario": "7-9 AM",
+      "actividades": ["act-01", "act-02"],
+      "helpers_asignados": [],
+      "personas_necesarias": 2,
+      "estado": "sin_cubrir",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-013",
+      "fecha": "2026-04-03",
+      "horario": "12-2 PM",
+      "actividades": ["act-07", "act-08"],
+      "helpers_asignados": [],
+      "personas_necesarias": 1,
+      "estado": "sin_cubrir",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-014",
+      "fecha": "2026-04-03",
+      "horario": "2-5 PM",
+      "actividades": ["act-05", "act-06"],
+      "helpers_asignados": ["h-03"],
+      "personas_necesarias": 1,
+      "estado": "pendiente",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-015",
+      "fecha": "2026-04-04",
+      "horario": "7-9 AM",
+      "actividades": ["act-01", "act-02"],
+      "helpers_asignados": ["h-01"],
+      "personas_necesarias": 2,
+      "estado": "confirmado",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-016",
+      "fecha": "2026-04-04",
+      "horario": "2-5 PM",
+      "actividades": ["act-03", "act-01", "act-05"],
+      "helpers_asignados": [],
+      "personas_necesarias": 2,
+      "estado": "sin_cubrir",
+      "importante": true,
+      "notas": "Papás tienen cita juntos 3-5pm"
+    },
+    {
+      "id": "blk-017",
+      "fecha": "2026-04-04",
+      "horario": "5-8 PM",
+      "actividades": ["act-09", "act-08"],
+      "helpers_asignados": ["h-02"],
+      "personas_necesarias": 1,
+      "estado": "pendiente",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-018",
+      "fecha": "2026-04-05",
+      "horario": "9-12 PM",
+      "actividades": ["act-07", "act-08", "act-09"],
+      "helpers_asignados": [],
+      "personas_necesarias": 1,
+      "estado": "sin_cubrir",
+      "importante": false,
+      "notas": ""
+    },
+    {
+      "id": "blk-019",
+      "fecha": "2026-04-05",
+      "horario": "2-5 PM",
+      "actividades": ["act-03", "act-05"],
+      "helpers_asignados": ["h-03"],
+      "personas_necesarias": 1,
+      "estado": "pendiente",
+      "importante": false,
+      "notas": ""
+    }
+  ]
+}

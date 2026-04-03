@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6c5ce7">
+  <title>Apoyo con Mellos - Agenda</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+  <header class="header">
+    <h1>Apoyo con Mellos</h1>
+    <p class="header-subtitle">Agenda semanal</p>
+    <nav class="header-nav">
+      <button class="active" id="btn-agenda">Agenda</button>
+      <button id="btn-helpers">Helpers</button>
+      <button id="btn-actividades">Actividades</button>
+    </nav>
+  </header>
+
+  <!-- Week Navigator -->
+  <div class="week-nav">
+    <button id="btn-prev-week" aria-label="Semana anterior">&larr;</button>
+    <div class="week-label" id="week-label">Cargando...</div>
+    <button id="btn-next-week" aria-label="Semana siguiente">&rarr;</button>
+  </div>
+
+  <!-- Summary Bar -->
+  <div class="summary-bar" id="summary-bar"></div>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <div class="loading"><div class="spinner"></div></div>
+  </main>
+
+  <!-- FAB: Add Block -->
+  <button class="fab" id="fab-add" title="Agregar bloque" aria-label="Agregar bloque">+</button>
+
+  <!-- Modal: Create/Edit Block -->
+  <div class="modal-overlay" id="modal-block">
+    <div class="modal">
+      <button class="modal-close" id="modal-block-close">&times;</button>
+      <h2 id="modal-block-title">Nuevo bloque</h2>
+      <form id="form-block">
+        <input type="hidden" id="block-id">
+        <input type="hidden" id="block-week">
+        <div class="form-group">
+          <label for="block-fecha">Fecha</label>
+          <input type="date" id="block-fecha" required>
+        </div>
+        <div class="form-group">
+          <label for="block-horario">Bloque horario</label>
+          <select id="block-horario" required></select>
+        </div>
+        <div class="form-group">
+          <label>Actividades necesitadas</label>
+          <div class="checkbox-list" id="block-actividades"></div>
+        </div>
+        <div class="form-group">
+          <label for="block-personas">Personas necesarias</label>
+          <select id="block-personas">
+            <option value="1">1 persona</option>
+            <option value="2">2 personas</option>
+            <option value="3">3 personas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <div class="checkbox-item" style="background:var(--color-sin-cubrir-bg)">
+            <input type="checkbox" id="block-importante">
+            <label for="block-importante" style="color:var(--color-sin-cubrir);font-weight:600">Marcar como PRIORITARIO</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="block-notas">Notas</label>
+          <textarea id="block-notas" placeholder="Ej: Cita médica de 10 a 12"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Guardar bloque</button>
+        <button type="button" class="btn btn-danger btn-block btn-sm" id="btn-delete-block" style="margin-top:8px;display:none">Eliminar bloque</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Helpers list -->
+  <div class="modal-overlay" id="modal-helpers">
+    <div class="modal">
+      <button class="modal-close" id="modal-helpers-close">&times;</button>
+      <h2>Helpers</h2>
+      <div id="helpers-list"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Actividades list -->
+  <div class="modal-overlay" id="modal-actividades">
+    <div class="modal">
+      <button class="modal-close" id="modal-actividades-close">&times;</button>
+      <h2>Catálogo de Actividades</h2>
+      <div id="actividades-list"></div>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/data-service.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+</body>
+</html>

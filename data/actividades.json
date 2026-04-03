@@ -1,0 +1,74 @@
+[
+  {
+    "id": "act-01",
+    "nombre": "Cambiar pañales",
+    "categoria": "Niños",
+    "requiere_experiencia": true,
+    "personas_requeridas": 1,
+    "instrucciones": "Pañales y crema en el cambiador del cuarto. Usar crema antipañalitis si hay irritación. Bolsa de desecho en el baño."
+  },
+  {
+    "id": "act-02",
+    "nombre": "Dar de comer a los niños",
+    "categoria": "Niños",
+    "requiere_experiencia": true,
+    "personas_requeridas": 2,
+    "instrucciones": "Biberón: calentar leche a 37°C, 180ml. Papilla: porciones en el refrigerador marcadas con fecha. Baberos en el cajón de la cocina. Idealmente una persona por bebé."
+  },
+  {
+    "id": "act-03",
+    "nombre": "Entretener a los niños",
+    "categoria": "Niños",
+    "requiere_experiencia": false,
+    "personas_requeridas": 1,
+    "instrucciones": "Juguetes en la sala. Pueden ver máx 20 min de TV (canciones infantiles). No dejar solos en ningún momento."
+  },
+  {
+    "id": "act-04",
+    "nombre": "Dormir a los niños",
+    "categoria": "Niños",
+    "requiere_experiencia": true,
+    "personas_requeridas": 2,
+    "instrucciones": "Rutina: cambiar pañal, poner pijama, música suave. Acostar boca arriba. Monitor de bebé encendido. Idealmente una persona por bebé."
+  },
+  {
+    "id": "act-05",
+    "nombre": "Pasear perrita al parque",
+    "categoria": "Perrita",
+    "requiere_experiencia": false,
+    "personas_requeridas": 1,
+    "instrucciones": "Correa y bolsas en la entrada. Paseo mínimo 20 min. Parque a 2 cuadras. Lleva agua si hace calor."
+  },
+  {
+    "id": "act-06",
+    "nombre": "Dar de comer a la perrita",
+    "categoria": "Perrita",
+    "requiere_experiencia": false,
+    "personas_requeridas": 1,
+    "instrucciones": "1 taza de concentrado en la mañana, 1 en la tarde. Plato en la cocina. Agua fresca siempre disponible."
+  },
+  {
+    "id": "act-07",
+    "nombre": "Hacer de comer",
+    "categoria": "Hogar",
+    "requiere_experiencia": false,
+    "personas_requeridas": 1,
+    "instrucciones": "Ingredientes en la nevera. Si no hay ideas, preparar algo sencillo: arroz, pollo, ensalada."
+  },
+  {
+    "id": "act-08",
+    "nombre": "Lavar loza",
+    "categoria": "Hogar",
+    "requiere_experiencia": false,
+    "personas_requeridas": 1,
+    "instrucciones": "Jabón y esponja bajo el lavaplatos. Biberones lavarlos con cepillo especial y esterilizar."
+  },
+  {
+    "id": "act-09",
+    "nombre": "Limpiar ropa de los niños",
+    "categoria": "Hogar",
+    "requiere_experiencia": false,
+    "personas_requeridas": 1,
+    "instrucciones": "Ropa sucia en canasta del cuarto de bebés. Usar jabón hipoalergénico (marca en la lavadora). No usar suavizante."
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "h-01",
+    "codigo": "abuela-maria-7x",
+    "nombre": "Abuela María",
+    "telefono": "+57 300 111 2222",
+    "actividades": ["act-01", "act-02", "act-03", "act-04", "act-07", "act-08"],
+    "disponibilidad": ["Lunes AM", "Martes AM", "Miércoles AM", "Jueves AM", "Viernes AM"],
+    "notas": "Tiene experiencia con bebés. Prefiere mañanas."
+  },
+  {
+    "id": "h-02",
+    "codigo": "tia-lucia-3k",
+    "nombre": "Tía Lucía",
+    "telefono": "+57 310 333 4444",
+    "actividades": ["act-03", "act-05", "act-06", "act-08", "act-09"],
+    "disponibilidad": ["Lunes PM", "Miércoles PM", "Sábado"],
+    "notas": "Trabaja en las mañanas. Disponible tardes y fines de semana."
+  },
+  {
+    "id": "h-03",
+    "codigo": "primo-andres-9m",
+    "nombre": "Primo Andrés",
+    "telefono": "+57 320 555 6666",
+    "actividades": ["act-05", "act-06", "act-07", "act-08"],
+    "disponibilidad": ["Martes PM", "Jueves PM", "Sábado", "Domingo"],
+    "notas": "No tiene experiencia con bebés pero ayuda con la perrita y tareas del hogar."
+  },
+  {
+    "id": "h-04",
+    "codigo": "vecina-sandra-2p",
+    "nombre": "Vecina Sandra",
+    "telefono": "+57 315 777 8888",
+    "actividades": ["act-01", "act-02", "act-03", "act-04", "act-07", "act-08", "act-09"],
+    "disponibilidad": ["Miércoles AM", "Miércoles PM", "Viernes PM", "Domingo"],
+    "notas": "Tiene hijos, mucha experiencia. Disponibilidad limitada pero muy confiable."
+  }
+]
