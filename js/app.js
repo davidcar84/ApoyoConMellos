@@ -57,11 +57,11 @@
     bindEvents();
     await loadWeek();
 
-    // Request notification permission and check priority alerts
-    const granted = await Notifier.requestPermission();
-    if (granted) {
-      Notifier.checkPriorityAlerts();
-    }
+    // Request notification permission after UI is ready (non-blocking)
+    setTimeout(async () => {
+      const granted = await Notifier.requestPermission();
+      if (granted) Notifier.checkPriorityAlerts();
+    }, 2000);
   }
 
   // ---- Load & Render Week ----

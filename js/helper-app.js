@@ -34,11 +34,11 @@
       bindEvents();
       await loadAgendas();
 
-      // Request notification permission and check reminders
-      const granted = await Notifier.requestPermission();
-      if (granted) {
-        Notifier.checkHelperReminders(helperData);
-      }
+      // Request notification permission after UI is ready (non-blocking)
+      setTimeout(async () => {
+        const granted = await Notifier.requestPermission();
+        if (granted) Notifier.checkHelperReminders(helperData);
+      }, 2000);
     } catch (err) {
       document.getElementById('main-content').innerHTML = `
         <div class="empty-state">
