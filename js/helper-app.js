@@ -33,6 +33,12 @@
       renderWelcome();
       bindEvents();
       await loadAgendas();
+
+      // Request notification permission and check reminders
+      const granted = await Notifier.requestPermission();
+      if (granted) {
+        Notifier.checkHelperReminders(helperData);
+      }
     } catch (err) {
       document.getElementById('main-content').innerHTML = `
         <div class="empty-state">

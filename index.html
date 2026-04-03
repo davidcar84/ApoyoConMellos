@@ -10,6 +10,19 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
+  <!-- PIN Screen -->
+  <div id="pin-screen" class="pin-screen">
+    <div class="pin-box">
+      <h1>Apoyo con Mellos</h1>
+      <p>Ingresa el PIN para acceder</p>
+      <input type="password" id="pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="PIN" autocomplete="off">
+      <button class="btn btn-primary btn-block" id="pin-submit">Entrar</button>
+      <p class="pin-error" id="pin-error" style="display:none">PIN incorrecto</p>
+    </div>
+  </div>
+
+  <!-- App (hidden until auth) -->
+  <div id="app-container" style="display:none">
   <header class="header">
     <h1>Apoyo con Mellos</h1>
     <p class="header-subtitle">Agenda semanal</p>
@@ -59,6 +72,10 @@
           <div class="checkbox-list" id="block-actividades"></div>
         </div>
         <div class="form-group">
+          <label>Asignar helpers</label>
+          <div class="checkbox-list" id="block-helpers"></div>
+        </div>
+        <div class="form-group">
           <label for="block-personas">Personas necesarias</label>
           <select id="block-personas">
             <option value="1">1 persona</option>
@@ -100,8 +117,11 @@
     </div>
   </div>
 
+  </div><!-- /app-container -->
+
   <script src="js/utils.js"></script>
   <script src="js/data-service.js"></script>
+  <script src="js/notifications.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

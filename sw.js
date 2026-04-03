@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apoyo-mellos-v1';
+const CACHE_NAME = 'apoyo-mellos-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   '/css/styles.css',
   '/js/utils.js',
   '/js/data-service.js',
+  '/js/notifications.js',
   '/js/app.js',
   '/js/helper-app.js',
   '/manifest.json'

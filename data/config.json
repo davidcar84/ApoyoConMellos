@@ -4,5 +4,7 @@
   "categorias": ["Niños", "Perrita", "Hogar"],
   "github_owner": "davidcar84",
   "github_repo": "ApoyoConMellos",
-  "github_branch": "main"
+  "github_branch": "main",
+  "pin_padres": "2726",
+  "vapid_public_key": ""
 }

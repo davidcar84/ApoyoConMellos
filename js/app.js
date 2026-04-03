@@ -10,15 +10,58 @@
   let configData = null;
   let activeFilter = null; // null = all, 'sin_cubrir', 'pendiente', 'confirmado', 'urgente'
 
+  // ---- PIN Auth ----
+  async function checkAuth() {
+    configData = await DataService.getConfig();
+    const stored = sessionStorage.getItem('pin_ok');
+    if (stored === configData.pin_padres) {
+      showApp();
+      return;
+    }
+    document.getElementById('pin-screen').style.display = 'flex';
+    const pinInput = document.getElementById('pin-input');
+    const pinBtn = document.getElementById('pin-submit');
+    const pinError = document.getElementById('pin-error');
+
+    function tryPin() {
+      if (pinInput.value === configData.pin_padres) {
+        sessionStorage.setItem('pin_ok', configData.pin_padres);
+        showApp();
+      } else {
+        pinError.style.display = 'block';
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    }
+
+    pinBtn.addEventListener('click', tryPin);
+    pinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryPin();
+    });
+    pinInput.focus();
+  }
+
+  async function showApp() {
+    document.getElementById('pin-screen').classList.add('hidden');
+    document.getElementById('app-container').style.display = '';
+    await init();
+  }
+
   // ---- Init ----
   async function init() {
-    configData = await DataService.getConfig();
     actividadesData = await DataService.getActividades();
     helpersData = await DataService.getHelpers();
     setupHorarioOptions();
     setupActividadesCheckboxes();
+    setupHelpersCheckboxes();
     bindEvents();
     await loadWeek();
+
+    // Request notification permission and check priority alerts
+    const granted = await Notifier.requestPermission();
+    if (granted) {
+      Notifier.checkPriorityAlerts();
+    }
   }
 
   // ---- Load & Render Week ----
@@ -261,6 +304,21 @@
     }).join('');
   }
 
+  function setupHelpersCheckboxes() {
+    const container = document.getElementById('block-helpers');
+    container.innerHTML = helpersData.map(h => {
+      const acts = h.actividades.map(id => {
+        const act = actividadesData.find(a => a.id === id);
+        return act ? act.nombre : '';
+      }).filter(Boolean).join(', ');
+      return `
+        <div class="checkbox-item">
+          <input type="checkbox" id="helper-${h.id}" value="${h.id}">
+          <label for="helper-${h.id}">${h.nombre} <small style="color:var(--color-text-light)">(${acts})</small></label>
+        </div>`;
+    }).join('');
+  }
+
   // ---- Events ----
   function bindEvents() {
     document.getElementById('btn-prev-week').addEventListener('click', () => {
@@ -379,6 +437,10 @@
       document.querySelectorAll('#block-actividades input').forEach(cb => {
         cb.checked = bloque.actividades.includes(cb.value);
       });
+      const assigned = getBlockHelpers(bloque);
+      document.querySelectorAll('#block-helpers input').forEach(cb => {
+        cb.checked = assigned.includes(cb.value);
+      });
       updateAvailableHorarios(bloque.fecha, bloque.id);
       document.getElementById('block-horario').value = bloque.horario;
       deleteBtn.style.display = 'block';
@@ -387,6 +449,9 @@
       document.getElementById('block-id').value = '';
       document.getElementById('form-block').reset();
       document.getElementById('block-personas').value = 1;
+      document.querySelectorAll('#block-helpers input').forEach(cb => {
+        cb.checked = false;
+      });
       const defaultDate = getTodayOrWeekDate();
       newFechaInput.value = defaultDate;
       updateAvailableHorarios(defaultDate, null);
@@ -417,10 +482,19 @@
     const personas = parseInt(document.getElementById('block-personas').value) || 1;
     const selectedActs = Array.from(document.querySelectorAll('#block-actividades input:checked'))
       .map(cb => cb.value);
+    const selectedHelpers = Array.from(document.querySelectorAll('#block-helpers input:checked'))
+      .map(cb => cb.value);
 
     if (selectedActs.length === 0) {
       showToast('Selecciona al menos una actividad');
       return;
+    }
+
+    // Auto-determine estado based on helpers
+    function calcEstado(helpers) {
+      if (helpers.length === 0) return 'sin_cubrir';
+      if (helpers.length >= personas) return 'confirmado';
+      return 'pendiente';
     }
 
     // Initialize agenda if needed
@@ -441,9 +515,11 @@
         agendaData.bloques[idx].fecha = fecha;
         agendaData.bloques[idx].horario = horario;
         agendaData.bloques[idx].actividades = selectedActs;
+        agendaData.bloques[idx].helpers_asignados = selectedHelpers;
         agendaData.bloques[idx].notas = notas;
         agendaData.bloques[idx].importante = importante;
         agendaData.bloques[idx].personas_necesarias = personas;
+        agendaData.bloques[idx].estado = calcEstado(selectedHelpers);
       }
     } else {
       // New block
@@ -452,9 +528,9 @@
         fecha,
         horario,
         actividades: selectedActs,
-        helpers_asignados: [],
+        helpers_asignados: selectedHelpers,
         personas_necesarias: personas,
-        estado: 'sin_cubrir',
+        estado: calcEstado(selectedHelpers),
         importante,
         notas
       });
@@ -462,8 +538,8 @@
 
     await saveAgenda();
     closeBlockModal();
-    renderAgenda();
     renderSummary();
+    renderAgenda();
     showToast(blockId ? 'Bloque actualizado' : 'Bloque creado');
   }
 
@@ -613,7 +689,9 @@
   }
 
   // ---- Start ----
-  init().catch(err => {
+  checkAuth().catch(err => {
+    document.getElementById('pin-screen').classList.add('hidden');
+    document.getElementById('app-container').style.display = '';
     document.getElementById('main-content').innerHTML = `
       <div class="empty-state">
         <div class="icon">&#9888;</div>
