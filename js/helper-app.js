@@ -33,12 +33,7 @@
       renderWelcome();
       bindEvents();
       await loadAgendas();
-
-      // Request notification permission after UI is ready (non-blocking)
-      setTimeout(async () => {
-        const granted = await Notifier.requestPermission();
-        if (granted) Notifier.checkHelperReminders(helperData);
-      }, 2000);
+      await loadNotifications();
     } catch (err) {
       document.getElementById('main-content').innerHTML = `
         <div class="empty-state">
@@ -325,6 +320,14 @@
     document.getElementById('modal-detalle').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
     });
+
+    document.getElementById('btn-notificaciones').addEventListener('click', showNotificaciones);
+    document.getElementById('modal-notificaciones-close').addEventListener('click', () => {
+      document.getElementById('modal-notificaciones').classList.remove('active');
+    });
+    document.getElementById('modal-notificaciones').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+    });
   }
 
   function bindBlockEvents() {
@@ -367,6 +370,15 @@
 
     try {
       await DataService.writeAgenda(week, agenda);
+      // Notify parents
+      DataService.addEvent({
+        type: 'helper_signup',
+        target: 'padres',
+        helperId: helperData.id,
+        message: `${helperData.nombre} se apuntó al bloque ${bloque.horario} del ${formatFecha(bloque.fecha)}`,
+        fecha: bloque.fecha,
+        horario: bloque.horario
+      });
       showToast('Te apuntaste. Los papás confirmarán pronto.');
       renderBlocks();
     } catch (err) {
@@ -409,6 +421,59 @@
 
     document.getElementById('detalle-content').innerHTML = html;
     document.getElementById('modal-detalle').classList.add('active');
+  }
+
+  // ---- Notificaciones (helper sees confirmations/rejections) ----
+  async function loadNotifications() {
+    try {
+      const events = await DataService.getEvents();
+      const lastSeen = localStorage.getItem(`notif_last_seen_${helperData.id}`) || '1970-01-01T00:00:00Z';
+      const myEvents = events.filter(e => e.target === 'helper' && e.helperId === helperData.id);
+      const unread = myEvents.filter(e => e.timestamp > lastSeen).length;
+      const badge = document.getElementById('notif-badge');
+      if (unread > 0) {
+        badge.textContent = unread > 99 ? '99+' : unread;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch { /* silent */ }
+  }
+
+  async function showNotificaciones() {
+    const events = await DataService.getEvents();
+    const lastSeen = localStorage.getItem(`notif_last_seen_${helperData.id}`) || '1970-01-01T00:00:00Z';
+    const myEvents = events.filter(e => e.target === 'helper' && e.helperId === helperData.id);
+
+    const container = document.getElementById('notificaciones-list');
+    if (myEvents.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No hay notificaciones</p></div>';
+    } else {
+      container.innerHTML = myEvents.slice(0, 50).map(e => {
+        const isUnread = e.timestamp > lastSeen;
+        const time = timeAgo(e.timestamp);
+        const icon = e.type === 'bloque_confirmado' ? '&#9989;' : '&#10060;';
+        return `<div class="notif-item${isUnread ? ' unread' : ''}">
+          <span class="notif-icon">${icon}</span>${e.message}
+          <div class="notif-time">${time}</div>
+        </div>`;
+      }).join('');
+    }
+
+    localStorage.setItem(`notif_last_seen_${helperData.id}`, new Date().toISOString());
+    document.getElementById('notif-badge').style.display = 'none';
+    document.getElementById('modal-notificaciones').classList.add('active');
+  }
+
+  function timeAgo(isoStr) {
+    const diff = Date.now() - new Date(isoStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Ahora';
+    if (mins < 60) return `Hace ${mins} min`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Hace ${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `Hace ${days}d`;
   }
 
   // ---- Start ----

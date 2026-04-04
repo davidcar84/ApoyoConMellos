@@ -20,12 +20,7 @@
     setupHelpersCheckboxes();
     bindEvents();
     await loadWeek();
-
-    // Request notification permission after UI is ready (non-blocking)
-    setTimeout(async () => {
-      const granted = await Notifier.requestPermission();
-      if (granted) Notifier.checkPriorityAlerts();
-    }, 2000);
+    await loadNotifications();
   }
 
   // ---- Load & Render Week ----
@@ -383,6 +378,14 @@
       if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
     });
 
+    // Notificaciones
+    document.getElementById('btn-notificaciones').addEventListener('click', showNotificaciones);
+    document.getElementById('modal-notificaciones-close').addEventListener('click', () => {
+      document.getElementById('modal-notificaciones').classList.remove('active');
+    });
+    document.getElementById('modal-notificaciones').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+    });
   }
 
   function bindBlockEvents() {
@@ -584,6 +587,33 @@
   async function updateEstado(blockId, estado, clearHelpers = false) {
     const bloque = agendaData.bloques.find(b => b.id === blockId);
     if (!bloque) return;
+
+    // Notify assigned helpers about the status change
+    const assignedHelpers = getBlockHelpers(bloque);
+    for (const hId of assignedHelpers) {
+      const h = helpersData.find(x => x.id === hId);
+      const helperName = h ? h.nombre : '?';
+      if (estado === 'confirmado') {
+        DataService.addEvent({
+          type: 'bloque_confirmado',
+          target: 'helper',
+          helperId: hId,
+          message: `Tu bloque del ${formatFecha(bloque.fecha)} (${bloque.horario}) fue confirmado`,
+          fecha: bloque.fecha,
+          horario: bloque.horario
+        });
+      } else if (estado === 'sin_cubrir' && clearHelpers) {
+        DataService.addEvent({
+          type: 'bloque_rechazado',
+          target: 'helper',
+          helperId: hId,
+          message: `Tu asignación al bloque del ${formatFecha(bloque.fecha)} (${bloque.horario}) fue rechazada`,
+          fecha: bloque.fecha,
+          horario: bloque.horario
+        });
+      }
+    }
+
     bloque.estado = estado;
     if (clearHelpers) {
       bloque.helpers_asignados = [];
@@ -932,6 +962,61 @@
     document.getElementById('modal-actividad-form').classList.remove('active');
     renderActividadesList();
     showToast('Actividad eliminada');
+  }
+
+  // ---- Notificaciones (parents see helper sign-ups) ----
+  async function loadNotifications() {
+    try {
+      const events = await DataService.getEvents();
+      const lastSeen = localStorage.getItem('notif_last_seen_padres') || '1970-01-01T00:00:00Z';
+      // Parents see events targeted at them
+      const parentEvents = events.filter(e => e.target === 'padres');
+      const unread = parentEvents.filter(e => e.timestamp > lastSeen).length;
+      const badge = document.getElementById('notif-badge');
+      if (unread > 0) {
+        badge.textContent = unread > 99 ? '99+' : unread;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch { /* silent */ }
+  }
+
+  async function showNotificaciones() {
+    const events = await DataService.getEvents();
+    const lastSeen = localStorage.getItem('notif_last_seen_padres') || '1970-01-01T00:00:00Z';
+    const parentEvents = events.filter(e => e.target === 'padres');
+
+    const container = document.getElementById('notificaciones-list');
+    if (parentEvents.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No hay notificaciones</p></div>';
+    } else {
+      container.innerHTML = parentEvents.slice(0, 50).map(e => {
+        const isUnread = e.timestamp > lastSeen;
+        const time = timeAgo(e.timestamp);
+        const icon = e.type === 'helper_signup' ? '&#9995;' : '&#128276;';
+        return `<div class="notif-item${isUnread ? ' unread' : ''}">
+          <span class="notif-icon">${icon}</span>${e.message}
+          <div class="notif-time">${time}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Mark as seen
+    localStorage.setItem('notif_last_seen_padres', new Date().toISOString());
+    document.getElementById('notif-badge').style.display = 'none';
+    document.getElementById('modal-notificaciones').classList.add('active');
+  }
+
+  function timeAgo(isoStr) {
+    const diff = Date.now() - new Date(isoStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Ahora';
+    if (mins < 60) return `Hace ${mins} min`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Hace ${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `Hace ${days}d`;
   }
 
   // ---- Start ----

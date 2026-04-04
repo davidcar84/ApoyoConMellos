@@ -98,12 +98,28 @@ const DataService = (() => {
     return agendas;
   }
 
+  // ---- Events / Notifications ----
+  async function addEvent(event) {
+    const id = 'evt-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+    event.id = id;
+    event.timestamp = new Date().toISOString();
+    await fbPut(`events/${id}`, event);
+  }
+
+  async function getEvents() {
+    const data = await fbGet('events');
+    if (!data) return [];
+    // Convert object to sorted array (newest first)
+    return Object.values(data).sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+  }
+
   return {
     getConfig,
     getActividades, writeActividades,
     getHelpers, writeHelpers,
     getHelper, getHelperById, getActividad,
     getAgenda, writeAgenda,
-    getVisibleWeeks, getAgendasVisibles
+    getVisibleWeeks, getAgendasVisibles,
+    addEvent, getEvents
   };
 })();
