@@ -64,7 +64,13 @@
   <script src="js/helper-app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        Promise.all(regs.map(r => r.unregister())).then(() => {
+          caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
+            navigator.serviceWorker.register('./sw.js');
+          });
+        });
+      });
     }
   </script>
 </body>

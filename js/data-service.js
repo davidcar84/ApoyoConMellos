@@ -3,9 +3,23 @@
 // ========================================
 
 const DataService = (() => {
+  const DATA_VERSION = '2';
   let config = null;
   let actividades = null;
   let helpers = null;
+
+  // If version changed, wipe old localStorage so fresh data loads from server
+  (function checkVersion() {
+    const stored = localStorage.getItem('data_version');
+    if (stored !== DATA_VERSION) {
+      localStorage.removeItem('actividades');
+      localStorage.removeItem('helpers');
+      // Clear all agenda keys
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('agenda_'));
+      keys.forEach(k => localStorage.removeItem(k));
+      localStorage.setItem('data_version', DATA_VERSION);
+    }
+  })();
 
   async function fetchJSON(path) {
     const resp = await fetch(path);
