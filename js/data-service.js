@@ -31,13 +31,35 @@ const DataService = (() => {
   }
 
   async function getActividades() {
-    if (!actividades) actividades = await fetchJSON('/data/actividades.json');
+    if (!actividades) {
+      const local = localStorage.getItem('actividades');
+      if (local) {
+        try { actividades = JSON.parse(local); } catch { /* fall through */ }
+      }
+      if (!actividades) actividades = await fetchJSON('/data/actividades.json');
+    }
     return actividades;
   }
 
+  async function writeActividades(data) {
+    actividades = data;
+    localStorage.setItem('actividades', JSON.stringify(data));
+  }
+
   async function getHelpers() {
-    if (!helpers) helpers = await fetchJSON('/data/helpers.json');
+    if (!helpers) {
+      const local = localStorage.getItem('helpers');
+      if (local) {
+        try { helpers = JSON.parse(local); } catch { /* fall through */ }
+      }
+      if (!helpers) helpers = await fetchJSON('/data/helpers.json');
+    }
     return helpers;
+  }
+
+  async function writeHelpers(data) {
+    helpers = data;
+    localStorage.setItem('helpers', JSON.stringify(data));
   }
 
   async function getHelper(codigo) {
@@ -147,7 +169,9 @@ const DataService = (() => {
   return {
     getConfig,
     getActividades,
+    writeActividades,
     getHelpers,
+    writeHelpers,
     getHelper,
     getHelperById,
     getActividad,

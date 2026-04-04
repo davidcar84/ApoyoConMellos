@@ -10,45 +10,9 @@
   let configData = null;
   let activeFilter = null; // null = all, 'sin_cubrir', 'pendiente', 'confirmado', 'urgente'
 
-  // ---- PIN Auth ----
-  async function checkAuth() {
-    configData = await DataService.getConfig();
-    const stored = sessionStorage.getItem('pin_ok');
-    if (stored === configData.pin_padres) {
-      showApp();
-      return;
-    }
-    document.getElementById('pin-screen').style.display = 'flex';
-    const pinInput = document.getElementById('pin-input');
-    const pinBtn = document.getElementById('pin-submit');
-    const pinError = document.getElementById('pin-error');
-
-    function tryPin() {
-      if (pinInput.value === configData.pin_padres) {
-        sessionStorage.setItem('pin_ok', configData.pin_padres);
-        showApp();
-      } else {
-        pinError.style.display = 'block';
-        pinInput.value = '';
-        pinInput.focus();
-      }
-    }
-
-    pinBtn.addEventListener('click', tryPin);
-    pinInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') tryPin();
-    });
-    pinInput.focus();
-  }
-
-  async function showApp() {
-    document.getElementById('pin-screen').classList.add('hidden');
-    document.getElementById('app-container').style.display = '';
-    await init();
-  }
-
   // ---- Init ----
   async function init() {
+    configData = await DataService.getConfig();
     actividadesData = await DataService.getActividades();
     helpersData = await DataService.getHelpers();
     setupHorarioOptions();
@@ -357,6 +321,28 @@
     document.getElementById('modal-actividades').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
     });
+
+    // Helper CRUD
+    document.getElementById('btn-add-helper').addEventListener('click', () => openHelperForm());
+    document.getElementById('form-helper').addEventListener('submit', handleSaveHelper);
+    document.getElementById('btn-delete-helper').addEventListener('click', handleDeleteHelper);
+    document.getElementById('modal-helper-form-close').addEventListener('click', () => {
+      document.getElementById('modal-helper-form').classList.remove('active');
+    });
+    document.getElementById('modal-helper-form').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+    });
+
+    // Actividad CRUD
+    document.getElementById('btn-add-actividad').addEventListener('click', () => openActividadForm());
+    document.getElementById('form-actividad').addEventListener('submit', handleSaveActividad);
+    document.getElementById('btn-delete-actividad').addEventListener('click', handleDeleteActividad);
+    document.getElementById('modal-actividad-form-close').addEventListener('click', () => {
+      document.getElementById('modal-actividad-form').classList.remove('active');
+    });
+    document.getElementById('modal-actividad-form').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+    });
   }
 
   function bindBlockEvents() {
@@ -626,9 +612,19 @@
     showToast(`${newBloques.length} bloques copiados de la semana anterior`);
   }
 
-  // ---- Helpers List ----
+  // ---- Helpers CRUD ----
   function showHelpers() {
+    renderHelpersList();
+    document.getElementById('modal-helpers').classList.add('active');
+  }
+
+  function renderHelpersList() {
     const container = document.getElementById('helpers-list');
+    if (helpersData.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No hay helpers registrados</p></div>';
+      return;
+    }
+
     container.innerHTML = helpersData.map(h => {
       const acts = h.actividades.map(id => {
         const act = actividadesData.find(a => a.id === id);
@@ -639,27 +635,146 @@
       const link = `${linkBase}?id=${h.codigo}`;
 
       return `
-        <div class="block-card" style="border-left-color:var(--color-primary);margin-bottom:12px">
+        <div class="block-card helper-card" style="border-left-color:var(--color-primary);margin-bottom:12px;cursor:pointer" data-helper-id="${h.id}">
           <div class="block-top">
             <span class="block-horario">${h.nombre}</span>
+            <button class="btn btn-outline btn-sm btn-edit-helper" data-helper-id="${h.id}" style="font-size:0.75rem;padding:2px 8px">Editar</button>
           </div>
           <div class="block-actividades">${acts}</div>
+          ${h.telefono ? `<div style="padding:2px 14px;font-size:0.8rem;color:var(--color-text-light)">Tel: ${h.telefono}</div>` : ''}
           <div class="block-footer">
             <span>${h.disponibilidad.join(', ')}</span>
           </div>
           <div style="padding:0 14px 12px">
-            <div style="font-size:0.8rem;color:var(--color-text-light)">Link: <a href="${link}" style="word-break:break-all">${link}</a></div>
+            <div style="font-size:0.75rem;color:var(--color-text-light)">Link: <a href="${link}" style="word-break:break-all" onclick="event.stopPropagation()">${link}</a></div>
           </div>
           ${h.notas ? `<div class="block-notas">${h.notas}</div>` : ''}
         </div>`;
     }).join('');
 
-    document.getElementById('modal-helpers').classList.add('active');
+    // Bind edit buttons
+    container.querySelectorAll('.btn-edit-helper').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const helper = helpersData.find(h => h.id === btn.dataset.helperId);
+        if (helper) openHelperForm(helper);
+      });
+    });
   }
 
-  // ---- Actividades List ----
+  function openHelperForm(helper = null) {
+    const modal = document.getElementById('modal-helper-form');
+    const title = document.getElementById('modal-helper-title');
+    const deleteBtn = document.getElementById('btn-delete-helper');
+
+    // Populate actividades checkboxes
+    const actContainer = document.getElementById('helper-actividades-list');
+    actContainer.innerHTML = actividadesData.map(act =>
+      `<div class="checkbox-item">
+        <input type="checkbox" id="hact-${act.id}" value="${act.id}">
+        <label for="hact-${act.id}">${act.nombre} <small style="color:var(--color-text-light)">(${act.categoria})</small></label>
+      </div>`
+    ).join('');
+
+    // Populate disponibilidad checkboxes
+    const dispContainer = document.getElementById('helper-disponibilidad-list');
+    const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    dispContainer.innerHTML = dias.map(d =>
+      `<div class="checkbox-item">
+        <input type="checkbox" id="hdisp-${d}" value="${d}">
+        <label for="hdisp-${d}">${d}</label>
+      </div>`
+    ).join('');
+
+    if (helper) {
+      title.textContent = 'Editar helper';
+      document.getElementById('helper-edit-id').value = helper.id;
+      document.getElementById('helper-nombre').value = helper.nombre;
+      document.getElementById('helper-telefono').value = helper.telefono || '';
+      document.getElementById('helper-notas').value = helper.notas || '';
+      actContainer.querySelectorAll('input').forEach(cb => {
+        cb.checked = helper.actividades.includes(cb.value);
+      });
+      dispContainer.querySelectorAll('input').forEach(cb => {
+        cb.checked = helper.disponibilidad.includes(cb.value);
+      });
+      deleteBtn.style.display = 'block';
+    } else {
+      title.textContent = 'Nuevo helper';
+      document.getElementById('helper-edit-id').value = '';
+      document.getElementById('form-helper').reset();
+      deleteBtn.style.display = 'none';
+    }
+
+    modal.classList.add('active');
+  }
+
+  async function handleSaveHelper(e) {
+    e.preventDefault();
+    const id = document.getElementById('helper-edit-id').value;
+    const nombre = document.getElementById('helper-nombre').value.trim();
+    const telefono = document.getElementById('helper-telefono').value.trim();
+    const notas = document.getElementById('helper-notas').value.trim();
+    const actividades = Array.from(document.querySelectorAll('#helper-actividades-list input:checked')).map(cb => cb.value);
+    const disponibilidad = Array.from(document.querySelectorAll('#helper-disponibilidad-list input:checked')).map(cb => cb.value);
+
+    if (!nombre) { showToast('El nombre es obligatorio'); return; }
+
+    if (id) {
+      const idx = helpersData.findIndex(h => h.id === id);
+      if (idx >= 0) {
+        helpersData[idx].nombre = nombre;
+        helpersData[idx].telefono = telefono;
+        helpersData[idx].notas = notas;
+        helpersData[idx].actividades = actividades;
+        helpersData[idx].disponibilidad = disponibilidad;
+      }
+    } else {
+      const codigo = nombre.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Math.random().toString(36).substr(2, 4);
+      helpersData.push({
+        id: 'hlp-' + Date.now().toString(36),
+        codigo,
+        nombre,
+        telefono,
+        actividades,
+        disponibilidad,
+        notas
+      });
+    }
+
+    await DataService.writeHelpers(helpersData);
+    setupHelpersCheckboxes();
+    setupActividadesCheckboxes();
+    document.getElementById('modal-helper-form').classList.remove('active');
+    renderHelpersList();
+    showToast(id ? 'Helper actualizado' : 'Helper creado');
+  }
+
+  async function handleDeleteHelper() {
+    const id = document.getElementById('helper-edit-id').value;
+    if (!id) return;
+    if (!confirm('¿Eliminar este helper?')) return;
+    helpersData = helpersData.filter(h => h.id !== id);
+    await DataService.writeHelpers(helpersData);
+    setupHelpersCheckboxes();
+    document.getElementById('modal-helper-form').classList.remove('active');
+    renderHelpersList();
+    showToast('Helper eliminado');
+  }
+
+  // ---- Actividades CRUD ----
   function showActividades() {
+    renderActividadesList();
+    document.getElementById('modal-actividades').classList.add('active');
+  }
+
+  function renderActividadesList() {
     const container = document.getElementById('actividades-list');
+    if (actividadesData.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No hay actividades registradas</p></div>';
+      return;
+    }
+
     const grouped = {};
     actividadesData.forEach(act => {
       if (!grouped[act.categoria]) grouped[act.categoria] = [];
@@ -672,26 +787,115 @@
       for (const act of acts) {
         const personasInfo = act.personas_requeridas > 1
           ? `<span class="personas-badge" style="margin-left:8px">${act.personas_requeridas} personas</span>` : '';
+        const catColor = cat === 'Niños' ? 'ninos' : cat === 'Perrita' ? 'perrita' : 'hogar';
         html += `
-          <div class="block-card" style="border-left-color:var(--color-${cat === 'Niños' ? 'ninos' : cat === 'Perrita' ? 'perrita' : 'hogar'});margin-bottom:8px">
+          <div class="block-card" style="border-left-color:var(--color-${catColor});margin-bottom:8px;cursor:pointer" data-act-id="${act.id}">
             <div class="block-top">
               <span class="block-horario" style="font-size:0.95rem">${act.nombre}</span>
-              ${act.requiere_experiencia ? '<span class="block-estado pendiente" style="font-size:0.7rem">Requiere exp.</span>' : ''}
+              <button class="btn btn-outline btn-sm btn-edit-actividad" data-act-id="${act.id}" style="font-size:0.75rem;padding:2px 8px">Editar</button>
             </div>
             ${personasInfo ? `<div style="padding:4px 14px">${personasInfo}</div>` : ''}
+            ${act.requiere_experiencia ? '<div style="padding:2px 14px;font-size:0.8rem;color:var(--color-pendiente)">Requiere experiencia</div>' : ''}
             ${act.instrucciones ? `<div class="instrucciones-panel"><strong>Instrucciones:</strong> ${act.instrucciones}</div>` : ''}
           </div>`;
       }
     }
 
     container.innerHTML = html;
-    document.getElementById('modal-actividades').classList.add('active');
+
+    // Bind edit buttons
+    container.querySelectorAll('.btn-edit-actividad').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const act = actividadesData.find(a => a.id === btn.dataset.actId);
+        if (act) openActividadForm(act);
+      });
+    });
+  }
+
+  function openActividadForm(actividad = null) {
+    const modal = document.getElementById('modal-actividad-form');
+    const title = document.getElementById('modal-actividad-title');
+    const deleteBtn = document.getElementById('btn-delete-actividad');
+
+    // Populate categorias
+    const catSel = document.getElementById('actividad-categoria');
+    catSel.innerHTML = configData.categorias.map(c =>
+      `<option value="${c}">${c}</option>`
+    ).join('');
+
+    if (actividad) {
+      title.textContent = 'Editar actividad';
+      document.getElementById('actividad-edit-id').value = actividad.id;
+      document.getElementById('actividad-nombre').value = actividad.nombre;
+      catSel.value = actividad.categoria;
+      document.getElementById('actividad-personas').value = actividad.personas_requeridas || 1;
+      document.getElementById('actividad-experiencia').checked = actividad.requiere_experiencia || false;
+      document.getElementById('actividad-instrucciones').value = actividad.instrucciones || '';
+      deleteBtn.style.display = 'block';
+    } else {
+      title.textContent = 'Nueva actividad';
+      document.getElementById('actividad-edit-id').value = '';
+      document.getElementById('form-actividad').reset();
+      deleteBtn.style.display = 'none';
+    }
+
+    modal.classList.add('active');
+  }
+
+  async function handleSaveActividad(e) {
+    e.preventDefault();
+    const id = document.getElementById('actividad-edit-id').value;
+    const nombre = document.getElementById('actividad-nombre').value.trim();
+    const categoria = document.getElementById('actividad-categoria').value;
+    const personas = parseInt(document.getElementById('actividad-personas').value) || 1;
+    const experiencia = document.getElementById('actividad-experiencia').checked;
+    const instrucciones = document.getElementById('actividad-instrucciones').value.trim();
+
+    if (!nombre) { showToast('El nombre es obligatorio'); return; }
+
+    if (id) {
+      const idx = actividadesData.findIndex(a => a.id === id);
+      if (idx >= 0) {
+        actividadesData[idx].nombre = nombre;
+        actividadesData[idx].categoria = categoria;
+        actividadesData[idx].personas_requeridas = personas;
+        actividadesData[idx].requiere_experiencia = experiencia;
+        actividadesData[idx].instrucciones = instrucciones;
+      }
+    } else {
+      actividadesData.push({
+        id: 'act-' + Date.now().toString(36),
+        nombre,
+        categoria,
+        personas_requeridas: personas,
+        requiere_experiencia: experiencia,
+        instrucciones
+      });
+    }
+
+    await DataService.writeActividades(actividadesData);
+    setupActividadesCheckboxes();
+    setupHelpersCheckboxes();
+    document.getElementById('modal-actividad-form').classList.remove('active');
+    renderActividadesList();
+    showToast(id ? 'Actividad actualizada' : 'Actividad creada');
+  }
+
+  async function handleDeleteActividad() {
+    const id = document.getElementById('actividad-edit-id').value;
+    if (!id) return;
+    if (!confirm('¿Eliminar esta actividad?')) return;
+    actividadesData = actividadesData.filter(a => a.id !== id);
+    await DataService.writeActividades(actividadesData);
+    setupActividadesCheckboxes();
+    document.getElementById('modal-actividad-form').classList.remove('active');
+    renderActividadesList();
+    showToast('Actividad eliminada');
   }
 
   // ---- Start ----
-  checkAuth().catch(err => {
-    document.getElementById('pin-screen').classList.add('hidden');
-    document.getElementById('app-container').style.display = '';
+  init().catch(err => {
     document.getElementById('main-content').innerHTML = `
       <div class="empty-state">
         <div class="icon">&#9888;</div>

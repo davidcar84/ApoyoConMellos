@@ -13,19 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="ApoyoMellos">
 </head>
 <body>
-  <!-- PIN Screen -->
-  <div id="pin-screen" class="pin-screen">
-    <div class="pin-box">
-      <h1>Apoyo con Mellos</h1>
-      <p>Ingresa el PIN para acceder</p>
-      <input type="password" id="pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="PIN" autocomplete="off">
-      <button class="btn btn-primary btn-block" id="pin-submit">Entrar</button>
-      <p class="pin-error" id="pin-error" style="display:none">PIN incorrecto</p>
-    </div>
-  </div>
-
-  <!-- App (hidden until auth) -->
-  <div id="app-container" style="display:none">
+  <div id="app-container">
   <header class="header">
     <h1>Apoyo con Mellos</h1>
     <p class="header-subtitle">Agenda semanal</p>
@@ -108,6 +96,40 @@
       <button class="modal-close" id="modal-helpers-close">&times;</button>
       <h2>Helpers</h2>
       <div id="helpers-list"></div>
+      <button class="btn btn-primary btn-block" id="btn-add-helper" style="margin-top:12px">+ Agregar helper</button>
+    </div>
+  </div>
+
+  <!-- Modal: Create/Edit Helper -->
+  <div class="modal-overlay" id="modal-helper-form">
+    <div class="modal">
+      <button class="modal-close" id="modal-helper-form-close">&times;</button>
+      <h2 id="modal-helper-title">Nuevo helper</h2>
+      <form id="form-helper">
+        <input type="hidden" id="helper-edit-id">
+        <div class="form-group">
+          <label for="helper-nombre">Nombre</label>
+          <input type="text" id="helper-nombre" required placeholder="Ej: Abuela María">
+        </div>
+        <div class="form-group">
+          <label for="helper-telefono">Teléfono</label>
+          <input type="tel" id="helper-telefono" placeholder="Opcional">
+        </div>
+        <div class="form-group">
+          <label>Actividades que puede hacer</label>
+          <div class="checkbox-list" id="helper-actividades-list"></div>
+        </div>
+        <div class="form-group">
+          <label>Disponibilidad</label>
+          <div class="checkbox-list" id="helper-disponibilidad-list"></div>
+        </div>
+        <div class="form-group">
+          <label for="helper-notas">Notas</label>
+          <textarea id="helper-notas" placeholder="Ej: Solo puede los fines de semana"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Guardar helper</button>
+        <button type="button" class="btn btn-danger btn-block btn-sm" id="btn-delete-helper" style="margin-top:8px;display:none">Eliminar helper</button>
+      </form>
     </div>
   </div>
 
@@ -117,6 +139,46 @@
       <button class="modal-close" id="modal-actividades-close">&times;</button>
       <h2>Catálogo de Actividades</h2>
       <div id="actividades-list"></div>
+      <button class="btn btn-primary btn-block" id="btn-add-actividad" style="margin-top:12px">+ Agregar actividad</button>
+    </div>
+  </div>
+
+  <!-- Modal: Create/Edit Actividad -->
+  <div class="modal-overlay" id="modal-actividad-form">
+    <div class="modal">
+      <button class="modal-close" id="modal-actividad-form-close">&times;</button>
+      <h2 id="modal-actividad-title">Nueva actividad</h2>
+      <form id="form-actividad">
+        <input type="hidden" id="actividad-edit-id">
+        <div class="form-group">
+          <label for="actividad-nombre">Nombre</label>
+          <input type="text" id="actividad-nombre" required placeholder="Ej: Dar de comer">
+        </div>
+        <div class="form-group">
+          <label for="actividad-categoria">Categoría</label>
+          <select id="actividad-categoria" required></select>
+        </div>
+        <div class="form-group">
+          <label for="actividad-personas">Personas requeridas</label>
+          <select id="actividad-personas">
+            <option value="1">1 persona</option>
+            <option value="2">2 personas</option>
+            <option value="3">3 personas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="actividad-experiencia">
+            <label for="actividad-experiencia">Requiere experiencia</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="actividad-instrucciones">Instrucciones</label>
+          <textarea id="actividad-instrucciones" placeholder="Instrucciones detalladas para esta actividad" rows="4"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Guardar actividad</button>
+        <button type="button" class="btn btn-danger btn-block btn-sm" id="btn-delete-actividad" style="margin-top:8px;display:none">Eliminar actividad</button>
+      </form>
     </div>
   </div>
 
