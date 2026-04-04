@@ -1,4 +1,4 @@
-const CACHE_NAME = 'apoyo-mellos-v7';
+const CACHE_NAME = 'apoyo-mellos-v8';
 const ASSETS = [
   './',
   './index.html',

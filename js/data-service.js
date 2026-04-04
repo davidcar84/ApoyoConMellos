@@ -18,14 +18,20 @@ const DataService = (() => {
     return config;
   }
 
-  // localStorage-first: CRUD changes persist in localStorage, server JSON is initial seed
+  // Network-first: server JSON is source of truth, localStorage is offline fallback
   async function getActividades() {
     if (actividades) return actividades;
-    const local = localStorage.getItem('actividades');
-    if (local) {
-      try { actividades = JSON.parse(local); return actividades; } catch { /* fall through */ }
+    try {
+      actividades = await fetchJSON('./data/actividades.json');
+      localStorage.setItem('actividades', JSON.stringify(actividades));
+    } catch {
+      const local = localStorage.getItem('actividades');
+      if (local) {
+        try { actividades = JSON.parse(local); } catch { actividades = []; }
+      } else {
+        actividades = [];
+      }
     }
-    actividades = await fetchJSON('./data/actividades.json');
     return actividades;
   }
 
@@ -34,14 +40,20 @@ const DataService = (() => {
     localStorage.setItem('actividades', JSON.stringify(data));
   }
 
-  // localStorage-first: CRUD changes persist in localStorage, server JSON is initial seed
+  // Network-first: server JSON is source of truth, localStorage is offline fallback
   async function getHelpers() {
     if (helpers) return helpers;
-    const local = localStorage.getItem('helpers');
-    if (local) {
-      try { helpers = JSON.parse(local); return helpers; } catch { /* fall through */ }
+    try {
+      helpers = await fetchJSON('./data/helpers.json');
+      localStorage.setItem('helpers', JSON.stringify(helpers));
+    } catch {
+      const local = localStorage.getItem('helpers');
+      if (local) {
+        try { helpers = JSON.parse(local); } catch { helpers = []; }
+      } else {
+        helpers = [];
+      }
     }
-    helpers = await fetchJSON('./data/helpers.json');
     return helpers;
   }
 
