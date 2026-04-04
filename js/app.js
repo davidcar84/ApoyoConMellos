@@ -383,16 +383,6 @@
       if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
     });
 
-    // Config
-    document.getElementById('btn-config').addEventListener('click', openConfig);
-    document.getElementById('modal-config-close').addEventListener('click', () => {
-      document.getElementById('modal-config').classList.remove('active');
-    });
-    document.getElementById('modal-config').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
-    });
-    document.getElementById('form-config').addEventListener('submit', handleSaveConfig);
-    document.getElementById('btn-force-sync').addEventListener('click', handleForceSync);
   }
 
   function bindBlockEvents() {
@@ -942,42 +932,6 @@
     document.getElementById('modal-actividad-form').classList.remove('active');
     renderActividadesList();
     showToast('Actividad eliminada');
-  }
-
-  // ---- Config ----
-  function openConfig() {
-    document.getElementById('config-token').value = DataService.getToken();
-    const status = document.getElementById('config-sync-status');
-    status.innerHTML = DataService.getToken()
-      ? '<span style="color:var(--color-confirmado);font-size:0.85rem">Token configurado - cambios se sincronizan a GitHub</span>'
-      : '<span style="color:var(--color-pendiente);font-size:0.85rem">Sin token - cambios solo se guardan en este dispositivo</span>';
-    document.getElementById('modal-config').classList.add('active');
-  }
-
-  function handleSaveConfig(e) {
-    e.preventDefault();
-    const token = document.getElementById('config-token').value.trim();
-    DataService.setToken(token);
-    document.getElementById('modal-config').classList.remove('active');
-    showToast(token ? 'Token guardado. Los cambios se sincronizarán.' : 'Token eliminado.');
-  }
-
-  async function handleForceSync() {
-    if (!confirm('Esto descargará los datos del servidor y reemplazará los datos locales. ¿Continuar?')) return;
-    localStorage.removeItem('actividades');
-    localStorage.removeItem('helpers');
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('agenda_'));
-    keys.forEach(k => localStorage.removeItem(k));
-    actividades = null;
-    helpers = null;
-    agendaData = null;
-    actividadesData = await DataService.getActividades();
-    helpersData = await DataService.getHelpers();
-    setupActividadesCheckboxes();
-    setupHelpersCheckboxes();
-    await loadWeek();
-    document.getElementById('modal-config').classList.remove('active');
-    showToast('Datos sincronizados desde el servidor');
   }
 
   // ---- Start ----

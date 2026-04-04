@@ -1,147 +1,55 @@
 // ========================================
-// Data Service - GitHub API as real-time backend
+// Data Service - Firebase Realtime Database
 // ========================================
 
 const DataService = (() => {
-  const DATA_VERSION = '3';
+  const FB = 'https://apoyoconmellos-default-rtdb.firebaseio.com';
   let config = null;
-  let actividades = null;
-  let helpers = null;
 
-  // Version check: wipe old localStorage on version change
-  (function checkVersion() {
-    const stored = localStorage.getItem('data_version');
-    if (stored !== DATA_VERSION) {
-      localStorage.removeItem('actividades');
-      localStorage.removeItem('helpers');
-      Object.keys(localStorage).filter(k => k.startsWith('agenda_')).forEach(k => localStorage.removeItem(k));
-      localStorage.setItem('data_version', DATA_VERSION);
-    }
-  })();
-
-  function getToken() {
-    return localStorage.getItem('github_token') || '';
-  }
-
-  function setToken(token) {
-    if (token) localStorage.setItem('github_token', token.trim());
-    else localStorage.removeItem('github_token');
-  }
-
-  // ---- Fetch helpers ----
-  async function fetchJSON(path) {
-    const resp = await fetch(path);
-    if (!resp.ok) throw new Error(`Error cargando ${path}: ${resp.status}`);
+  // ---- Firebase helpers ----
+  async function fbGet(path) {
+    const resp = await fetch(`${FB}/${path}.json`);
+    if (!resp.ok) throw new Error(`Firebase read error: ${resp.status}`);
     return resp.json();
   }
 
-  function githubHeaders() {
-    return {
-      'Authorization': `Bearer ${getToken()}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    };
-  }
-
-  // Read a file directly from GitHub API (bypasses Pages CDN cache)
-  async function readFromGitHub(filePath) {
-    const cfg = await getConfig();
-    const url = `https://api.github.com/repos/${cfg.github_owner}/${cfg.github_repo}/contents/${filePath}?ref=${cfg.github_branch}&t=${Date.now()}`;
-    const resp = await fetch(url, { headers: githubHeaders() });
-    if (!resp.ok) return null;
-    const info = await resp.json();
-    return JSON.parse(decodeURIComponent(escape(atob(info.content))));
-  }
-
-  // Write a file to GitHub API
-  async function writeToGitHub(filePath, data) {
-    if (!getToken()) return;
-    const cfg = await getConfig();
-    const apiBase = `https://api.github.com/repos/${cfg.github_owner}/${cfg.github_repo}/contents/${filePath}`;
-
-    // Get current SHA
-    let sha = null;
-    try {
-      const existing = await fetch(apiBase, { headers: githubHeaders() });
-      if (existing.ok) sha = (await existing.json()).sha;
-    } catch { /* file may not exist */ }
-
-    const body = {
-      message: `Actualizar ${filePath}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
-      branch: cfg.github_branch
-    };
-    if (sha) body.sha = sha;
-
-    const resp = await fetch(apiBase, {
+  async function fbPut(path, data) {
+    const resp = await fetch(`${FB}/${path}.json`, {
       method: 'PUT',
-      headers: githubHeaders(),
-      body: JSON.stringify(body)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
     });
-
-    if (!resp.ok) {
-      const err = await resp.json();
-      console.error(`GitHub write error (${filePath}):`, err.message);
-    }
+    if (!resp.ok) throw new Error(`Firebase write error: ${resp.status}`);
   }
 
-  // ---- Config ----
+  // ---- Config (still local, no need to sync) ----
   async function getConfig() {
-    if (!config) config = await fetchJSON('./data/config.json');
+    if (!config) {
+      const resp = await fetch('./data/config.json');
+      if (!resp.ok) throw new Error('Error cargando config');
+      config = await resp.json();
+    }
     return config;
-  }
-
-  // ---- Generic getter: GitHub API first, then localStorage, then static file ----
-  async function getData(key, staticPath) {
-    // If token exists, read fresh from GitHub API
-    if (getToken()) {
-      try {
-        const data = await readFromGitHub(staticPath);
-        if (data) {
-          localStorage.setItem(key, JSON.stringify(data));
-          return data;
-        }
-      } catch (e) {
-        console.warn(`GitHub API read failed for ${staticPath}, falling back`, e);
-      }
-    }
-
-    // Fallback: localStorage
-    const local = localStorage.getItem(key);
-    if (local) {
-      try { return JSON.parse(local); } catch { /* fall through */ }
-    }
-
-    // Last resort: static file from Pages
-    const data = await fetchJSON('./' + staticPath);
-    localStorage.setItem(key, JSON.stringify(data));
-    return data;
   }
 
   // ---- Actividades ----
   async function getActividades() {
-    if (actividades) return actividades;
-    actividades = await getData('actividades', 'data/actividades.json');
-    return actividades;
+    const data = await fbGet('actividades');
+    return data || [];
   }
 
   async function writeActividades(data) {
-    actividades = data;
-    localStorage.setItem('actividades', JSON.stringify(data));
-    await writeToGitHub('data/actividades.json', data);
+    await fbPut('actividades', data);
   }
 
   // ---- Helpers ----
   async function getHelpers() {
-    if (helpers) return helpers;
-    helpers = await getData('helpers', 'data/helpers.json');
-    return helpers;
+    const data = await fbGet('helpers');
+    return data || [];
   }
 
   async function writeHelpers(data) {
-    helpers = data;
-    localStorage.setItem('helpers', JSON.stringify(data));
-    await writeToGitHub('data/helpers.json', data);
+    await fbPut('helpers', data);
   }
 
   async function getHelper(codigo) {
@@ -161,34 +69,12 @@ const DataService = (() => {
 
   // ---- Agendas ----
   async function getAgenda(isoWeek) {
-    // If token exists, try GitHub API first for fresh data
-    if (getToken()) {
-      try {
-        const data = await readFromGitHub(`data/agenda/${isoWeek}.json`);
-        if (data) {
-          localStorage.setItem(`agenda_${isoWeek}`, JSON.stringify(data));
-          return data;
-        }
-      } catch { /* fall through */ }
-    }
-
-    // Fallback: localStorage
-    const local = localStorage.getItem(`agenda_${isoWeek}`);
-    if (local) {
-      try { return JSON.parse(local); } catch { /* fall through */ }
-    }
-
-    // Last resort: static file
-    try {
-      return await fetchJSON(`./data/agenda/${isoWeek}.json`);
-    } catch {
-      return null;
-    }
+    const data = await fbGet(`agendas/${isoWeek}`);
+    return data || null;
   }
 
   async function writeAgenda(isoWeek, agendaData) {
-    localStorage.setItem(`agenda_${isoWeek}`, JSON.stringify(agendaData));
-    await writeToGitHub(`data/agenda/${isoWeek}.json`, agendaData);
+    await fbPut(`agendas/${isoWeek}`, agendaData);
   }
 
   // ---- Weeks ----
@@ -218,7 +104,6 @@ const DataService = (() => {
     getHelpers, writeHelpers,
     getHelper, getHelperById, getActividad,
     getAgenda, writeAgenda,
-    getVisibleWeeks, getAgendasVisibles,
-    getToken, setToken
+    getVisibleWeeks, getAgendasVisibles
   };
 })();

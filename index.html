@@ -22,7 +22,6 @@
       <button class="active" id="btn-agenda">Agenda</button>
       <button id="btn-helpers">Helpers</button>
       <button id="btn-actividades">Actividades</button>
-      <button id="btn-config" style="margin-left:auto;font-size:1.1rem" title="Configuración">&#9881;</button>
     </nav>
   </header>
 
@@ -180,24 +179,6 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">Guardar actividad</button>
         <button type="button" class="btn btn-danger btn-block btn-sm" id="btn-delete-actividad" style="margin-top:8px;display:none">Eliminar actividad</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: Config -->
-  <div class="modal-overlay" id="modal-config">
-    <div class="modal">
-      <button class="modal-close" id="modal-config-close">&times;</button>
-      <h2>Configuración</h2>
-      <form id="form-config">
-        <div class="form-group">
-          <label for="config-token">GitHub Token</label>
-          <input type="password" id="config-token" placeholder="github_pat_...">
-          <small style="color:var(--color-text-light);display:block;margin-top:4px">Permite sincronizar datos entre dispositivos via GitHub API</small>
-        </div>
-        <div id="config-sync-status" style="margin-bottom:12px"></div>
-        <button type="submit" class="btn btn-primary btn-block">Guardar</button>
-        <button type="button" class="btn btn-outline btn-block btn-sm" id="btn-force-sync" style="margin-top:8px">Forzar sincronización desde servidor</button>
       </form>
     </div>
   </div>
