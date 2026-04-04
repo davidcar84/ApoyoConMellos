@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#1a73e8"/>
+  <rect x="16" y="16" width="480" height="480" rx="68" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4"/>
+
+  <!-- Hands (cupped, holding babies) -->
+  <!-- Left hand -->
+  <path d="M100,340 Q80,310 90,280 Q100,260 120,260 L200,260 Q220,260 225,280 Q230,300 225,320 L220,340 Q215,360 195,370 L125,370 Q105,360 100,340Z" fill="#5ba3f5" opacity="0.9"/>
+  <!-- Left hand fingers -->
+  <path d="M90,280 Q82,265 92,252 Q100,244 110,250 L120,260" fill="#5ba3f5" opacity="0.9"/>
+  <path d="M225,280 Q233,265 228,250 Q222,240 212,248 L200,260" fill="#5ba3f5" opacity="0.9"/>
+
+  <!-- Right hand -->
+  <path d="M290,340 Q270,310 280,280 Q290,260 310,260 L390,260 Q410,260 415,280 Q420,300 415,320 L410,340 Q405,360 385,370 L315,370 Q295,360 290,340Z" fill="#4285f4" opacity="0.9"/>
+  <!-- Right hand fingers -->
+  <path d="M280,280 Q272,265 282,252 Q290,244 300,250 L310,260" fill="#4285f4" opacity="0.9"/>
+  <path d="M415,280 Q423,265 418,250 Q412,240 402,248 L390,260" fill="#4285f4" opacity="0.9"/>
+
+  <!-- Baby 1 (left) - wrapped in blanket -->
+  <ellipse cx="160" cy="270" rx="42" ry="50" fill="#e8f0fe"/>
+  <!-- Baby 1 blanket wrap -->
+  <path d="M125,285 Q130,240 160,225 Q190,240 195,285 Q190,310 160,318 Q130,310 125,285Z" fill="#aecbfa"/>
+  <!-- Baby 1 head -->
+  <circle cx="160" cy="238" r="28" fill="#fce4b8"/>
+  <!-- Baby 1 face -->
+  <ellipse cx="150" cy="236" rx="3" ry="3.5" fill="#2c3e50"/>
+  <ellipse cx="170" cy="236" rx="3" ry="3.5" fill="#2c3e50"/>
+  <!-- Baby 1 smile -->
+  <path d="M152,246 Q160,253 168,246" fill="none" stroke="#d4846a" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Baby 1 cheeks -->
+  <circle cx="146" cy="244" r="5" fill="#f5c6a8" opacity="0.6"/>
+  <circle cx="174" cy="244" r="5" fill="#f5c6a8" opacity="0.6"/>
+  <!-- Baby 1 hair tuft -->
+  <path d="M148,213 Q155,205 160,210 Q165,205 172,213" fill="none" stroke="#8B6914" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Baby 2 (right) - wrapped in blanket -->
+  <ellipse cx="350" cy="270" rx="42" ry="50" fill="#e8f0fe"/>
+  <!-- Baby 2 blanket wrap -->
+  <path d="M315,285 Q320,240 350,225 Q380,240 385,285 Q380,310 350,318 Q320,310 315,285Z" fill="#7baaf7"/>
+  <!-- Baby 2 head -->
+  <circle cx="350" cy="238" r="28" fill="#fce4b8"/>
+  <!-- Baby 2 face -->
+  <ellipse cx="340" cy="236" rx="3" ry="3.5" fill="#2c3e50"/>
+  <ellipse cx="360" cy="236" rx="3" ry="3.5" fill="#2c3e50"/>
+  <!-- Baby 2 smile -->
+  <path d="M342,246 Q350,253 358,246" fill="none" stroke="#d4846a" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Baby 2 cheeks -->
+  <circle cx="336" cy="244" r="5" fill="#f5c6a8" opacity="0.6"/>
+  <circle cx="364" cy="244" r="5" fill="#f5c6a8" opacity="0.6"/>
+  <!-- Baby 2 hair tuft -->
+  <path d="M338,213 Q345,205 350,210 Q355,205 362,213" fill="none" stroke="#8B6914" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Heart between babies -->
+  <path d="M248,260 Q248,248 256,248 Q264,248 264,260 Q264,272 256,280 Q248,272 248,260Z" fill="#ff6b8a" opacity="0.8"/>
+
+  <!-- Text at bottom -->
+  <text x="256" y="410" text-anchor="middle" font-size="42" font-family="Arial, sans-serif" fill="white" font-weight="700" letter-spacing="2">APOYO</text>
+  <text x="256" y="452" text-anchor="middle" font-size="30" font-family="Arial, sans-serif" fill="rgba(255,255,255,0.8)" font-weight="600">con Mellos</text>
+</svg>
