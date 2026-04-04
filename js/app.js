@@ -34,8 +34,47 @@
     document.getElementById('week-label').textContent = weekLabel(currentWeek);
     document.getElementById('main-content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
     agendaData = await DataService.getAgenda(currentWeek);
+    cleanBrokenRefs();
     renderSummary();
     renderAgenda();
+  }
+
+  // Remove references to deleted helpers/actividades and fix estado
+  function cleanBrokenRefs() {
+    if (!agendaData || !agendaData.bloques) return;
+    const helperIds = new Set(helpersData.map(h => h.id));
+    const actIds = new Set(actividadesData.map(a => a.id));
+    let changed = false;
+
+    for (const bloque of agendaData.bloques) {
+      // Clean deleted helpers
+      if (bloque.helpers_asignados) {
+        const before = bloque.helpers_asignados.length;
+        bloque.helpers_asignados = bloque.helpers_asignados.filter(id => helperIds.has(id));
+        if (bloque.helpers_asignados.length !== before) changed = true;
+      }
+      // Clean deleted actividades
+      const beforeActs = bloque.actividades.length;
+      bloque.actividades = bloque.actividades.filter(id => actIds.has(id));
+      if (bloque.actividades.length !== beforeActs) changed = true;
+
+      // Recalc estado if helpers changed
+      if (changed) {
+        const assigned = (bloque.helpers_asignados || []).length;
+        const needed = bloque.personas_necesarias || 1;
+        if (assigned === 0) bloque.estado = 'sin_cubrir';
+        else if (assigned < needed) bloque.estado = 'pendiente';
+      }
+    }
+
+    // Remove blocks with no actividades left
+    const beforeLen = agendaData.bloques.length;
+    agendaData.bloques = agendaData.bloques.filter(b => b.actividades.length > 0);
+    if (agendaData.bloques.length !== beforeLen) changed = true;
+
+    if (changed) {
+      DataService.writeAgenda(currentWeek, agendaData);
+    }
   }
 
   // Helper: get helpers array from block (supports old and new format)

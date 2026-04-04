@@ -1,5 +1,5 @@
 // ========================================
-// Data Service - reads from GitHub Pages, writes via GitHub API
+// Data Service - reads from GitHub Pages, writes to localStorage
 // ========================================
 
 const DataService = (() => {
@@ -7,36 +7,30 @@ const DataService = (() => {
   let actividades = null;
   let helpers = null;
 
-  // Base URL: detect GitHub Pages subdirectory or local dev
-  function getBaseUrl() {
-    const path = location.pathname;
-    // GitHub Pages with repo subdirectory: /ApoyoConMellos/
-    if (location.hostname.includes('github.io')) {
-      const match = path.match(/^\/[^/]+/);
-      return match ? match[0] : '';
-    }
-    return '';
-  }
-
   async function fetchJSON(path) {
-    const url = `${getBaseUrl()}${path}`;
-    const resp = await fetch(url);
+    const resp = await fetch(path);
     if (!resp.ok) throw new Error(`Error cargando ${path}: ${resp.status}`);
     return resp.json();
   }
 
   async function getConfig() {
-    if (!config) config = await fetchJSON('/data/config.json');
+    if (!config) config = await fetchJSON('./data/config.json');
     return config;
   }
 
-  async function getActividades() {
-    if (!actividades) {
+  // Network-first: try server, save to localStorage, fallback to localStorage
+  async function getActividades(forceRefresh = false) {
+    if (actividades && !forceRefresh) return actividades;
+    try {
+      actividades = await fetchJSON('./data/actividades.json');
+      localStorage.setItem('actividades', JSON.stringify(actividades));
+    } catch {
       const local = localStorage.getItem('actividades');
       if (local) {
-        try { actividades = JSON.parse(local); } catch { /* fall through */ }
+        try { actividades = JSON.parse(local); } catch { actividades = []; }
+      } else {
+        actividades = [];
       }
-      if (!actividades) actividades = await fetchJSON('/data/actividades.json');
     }
     return actividades;
   }
@@ -46,13 +40,19 @@ const DataService = (() => {
     localStorage.setItem('actividades', JSON.stringify(data));
   }
 
-  async function getHelpers() {
-    if (!helpers) {
+  // Network-first: try server, save to localStorage, fallback to localStorage
+  async function getHelpers(forceRefresh = false) {
+    if (helpers && !forceRefresh) return helpers;
+    try {
+      helpers = await fetchJSON('./data/helpers.json');
+      localStorage.setItem('helpers', JSON.stringify(helpers));
+    } catch {
       const local = localStorage.getItem('helpers');
       if (local) {
-        try { helpers = JSON.parse(local); } catch { /* fall through */ }
+        try { helpers = JSON.parse(local); } catch { helpers = []; }
+      } else {
+        helpers = [];
       }
-      if (!helpers) helpers = await fetchJSON('/data/helpers.json');
     }
     return helpers;
   }
@@ -85,13 +85,13 @@ const DataService = (() => {
     }
     // Fallback to static file on server
     try {
-      return await fetchJSON(`/data/agenda/${isoWeek}.json`);
+      return await fetchJSON(`./data/agenda/${isoWeek}.json`);
     } catch {
       return null;
     }
   }
 
-  // Write via GitHub API (for helper self-assignment)
+  // Write agenda to localStorage (and optionally GitHub API)
   async function writeAgenda(isoWeek, agendaData) {
     const cfg = await getConfig();
     const path = `data/agenda/${isoWeek}.json`;
