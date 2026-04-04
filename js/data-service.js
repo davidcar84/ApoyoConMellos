@@ -18,20 +18,14 @@ const DataService = (() => {
     return config;
   }
 
-  // Network-first: try server, save to localStorage, fallback to localStorage
-  async function getActividades(forceRefresh = false) {
-    if (actividades && !forceRefresh) return actividades;
-    try {
-      actividades = await fetchJSON('./data/actividades.json');
-      localStorage.setItem('actividades', JSON.stringify(actividades));
-    } catch {
-      const local = localStorage.getItem('actividades');
-      if (local) {
-        try { actividades = JSON.parse(local); } catch { actividades = []; }
-      } else {
-        actividades = [];
-      }
+  // localStorage-first: CRUD changes persist in localStorage, server JSON is initial seed
+  async function getActividades() {
+    if (actividades) return actividades;
+    const local = localStorage.getItem('actividades');
+    if (local) {
+      try { actividades = JSON.parse(local); return actividades; } catch { /* fall through */ }
     }
+    actividades = await fetchJSON('./data/actividades.json');
     return actividades;
   }
 
@@ -40,20 +34,14 @@ const DataService = (() => {
     localStorage.setItem('actividades', JSON.stringify(data));
   }
 
-  // Network-first: try server, save to localStorage, fallback to localStorage
-  async function getHelpers(forceRefresh = false) {
-    if (helpers && !forceRefresh) return helpers;
-    try {
-      helpers = await fetchJSON('./data/helpers.json');
-      localStorage.setItem('helpers', JSON.stringify(helpers));
-    } catch {
-      const local = localStorage.getItem('helpers');
-      if (local) {
-        try { helpers = JSON.parse(local); } catch { helpers = []; }
-      } else {
-        helpers = [];
-      }
+  // localStorage-first: CRUD changes persist in localStorage, server JSON is initial seed
+  async function getHelpers() {
+    if (helpers) return helpers;
+    const local = localStorage.getItem('helpers');
+    if (local) {
+      try { helpers = JSON.parse(local); return helpers; } catch { /* fall through */ }
     }
+    helpers = await fetchJSON('./data/helpers.json');
     return helpers;
   }
 
