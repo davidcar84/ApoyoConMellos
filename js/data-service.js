@@ -18,20 +18,15 @@ const DataService = (() => {
     return config;
   }
 
-  // Network-first: server JSON is source of truth, localStorage is offline fallback
+  // localStorage-first: user edits persist locally, server JSON is only initial seed
   async function getActividades() {
     if (actividades) return actividades;
-    try {
-      actividades = await fetchJSON('./data/actividades.json');
-      localStorage.setItem('actividades', JSON.stringify(actividades));
-    } catch {
-      const local = localStorage.getItem('actividades');
-      if (local) {
-        try { actividades = JSON.parse(local); } catch { actividades = []; }
-      } else {
-        actividades = [];
-      }
+    const local = localStorage.getItem('actividades');
+    if (local) {
+      try { actividades = JSON.parse(local); return actividades; } catch { /* fall through */ }
     }
+    actividades = await fetchJSON('./data/actividades.json');
+    localStorage.setItem('actividades', JSON.stringify(actividades));
     return actividades;
   }
 
@@ -40,20 +35,15 @@ const DataService = (() => {
     localStorage.setItem('actividades', JSON.stringify(data));
   }
 
-  // Network-first: server JSON is source of truth, localStorage is offline fallback
+  // localStorage-first: user edits persist locally, server JSON is only initial seed
   async function getHelpers() {
     if (helpers) return helpers;
-    try {
-      helpers = await fetchJSON('./data/helpers.json');
-      localStorage.setItem('helpers', JSON.stringify(helpers));
-    } catch {
-      const local = localStorage.getItem('helpers');
-      if (local) {
-        try { helpers = JSON.parse(local); } catch { helpers = []; }
-      } else {
-        helpers = [];
-      }
+    const local = localStorage.getItem('helpers');
+    if (local) {
+      try { helpers = JSON.parse(local); return helpers; } catch { /* fall through */ }
     }
+    helpers = await fetchJSON('./data/helpers.json');
+    localStorage.setItem('helpers', JSON.stringify(helpers));
     return helpers;
   }
 
